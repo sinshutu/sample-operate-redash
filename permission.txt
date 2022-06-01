@@ -1,0 +1,60 @@
+編集権限まわりの詳細
+```
+* view_query
+  * クエリ一覧の表示
+  * クエリの実行結果の表示
+  * パラメータ付きのクエリも実行可能
+* view_dashboard
+  * publishされたdashboard一覧の表示
+  * アクセス権のないdata_sourceに紐づくqueryがある場合はそのwidegtが表示されない
+    * dashboard自体を開くことは可能
+* view_source
+  * EditSource機能の利用、UIにボタンが表示されるようになる
+  * クエリを書き換えることができるが、変更した時点でexecuteボタンがdisableになる
+  * saveはできない
+    * REDASH_FEATURE_SHOW_PERMISSIONS_CONTROLを有効化しManagePermissionに追加されている場合、ボタンは表示されるが、実行してもエラーになる
+* edit_query
+  * queryに対してsaveができるようになる
+  * New Visualizationの変更もこの権限
+  * execute_query権限がないとSaveしてからExecuteしないと結果が見れない
+* execute_query
+  * EditSource機能で所有権関係なくSQLの書き換えが可能
+  * これ単体ではsaveができないため、edit_query権限が必要
+```
+
+
+※補足
+```
+思い込みと違い勘があった部分
+* パラメータ付きのqueryの実行権限はview_queryがあれば実行できる
+  * 実行できていなかったのは、data_sourceに対するアクセス権がなかったため発生していた可能性
+* edit_source機能を使うには、view_sourceが必要
+  * パラメータを超えて任意のSQLを実行させたくない場合は、これを外しておく必要がある
+```
+
+
+
+上記を踏まえて各種groupsの権限
+
+```
+* admin
+  * admin, super_adminに加えてすべての権限を持つ状態にする
+* default
+  * view-onlyな状態を保つため、dashboard,queryそれぞれの一覧を表示できるだけ
+  * view-dbを作成してdata_soucesの設定をそちらで管理するか、defaultに紐付けるのであればなくても良さそう
+  * permission: 'view_query,list_dashboards'
+* view-db
+  * パラメータ付きのqueryの実行ができる、query、dashboardの作成や編集はできない
+  * permission: 'view_query,list_dashboards'
+  * data_sources: [任意]
+* exec-db
+  * 他人が作成したqueryの編集ができる、クエリの新規作成はできず、dashboardの編集もできない
+  * 他人のqueryを編集するためには、REDASH_FEATURE_SHOW_PERMISSIONS_CONTROLが有効になっていて、ManagePermissionに追加されている必要がある
+  * permission: 'view_source,edit_query,execute_query'
+* query-db
+  * クエリの新規作成、編集、dashboardの新規作成、編集などができる
+  * 本来のredashのdefault権限にあたる権限を持つ
+  * permission: 'create_dashboard,create_query,edit_dashboard,edit_query,view_source,execute_query,list_users,schedule_query,list_alerts,list_data_sources'
+```
+
+1点確認で、exec-dbに必要な権限って「他人が作成したqueryの編集ができる」だけという認識であってましたか?

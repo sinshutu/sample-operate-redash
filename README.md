@@ -37,12 +37,30 @@ DEFAULT_PERMISSIONS:
 * list_alerts
 * list_data_sources
 
+serial: 'create_dashboard,create_query,edit_dashboard,edit_query,view_query,view_source,execute_query,list_users,schedule_query,list_dashboards,list_alerts,list_data_sources'
+
 ```
-# query-db, デフォルトのまま
-./manage.py groups change_permissions --permissions 'create_dashboard,create_query,edit_dashboard,edit_query,view_query,view_source,execute_query,list_users,schedule_query,list_dashboards,list_alerts,list_data_sources' $GROUP_ID
+# admin, admin,super_adminに加えて、標準のデフォルト権限を追加
+./manage.py groups change_permissions --permissions 'admin,super_admin,create_dashboard,create_query,edit_dashboard,edit_query,view_query,view_source,execute_query,list_users,schedule_query,list_dashboards,list_alerts,list_data_sources' 1
 ```
 
 ```
-# view-db, edit_queryを削除
-./manage.py groups change_permissions --permissions 'create_dashboard,create_query,edit_dashboard,view_query,view_source,execute_query,list_users,schedule_query,list_dashboards,list_alerts,list_data_sources' $GROUP_ID
+# default(view-dbと同義と見なせそう), view以外に関するものを削除
+./manage.py groups change_permissions --permissions 'view_query,list_dashboards' 2
 ```
+
+```
+# view-db, view以外に関するものを削除
+./manage.py groups change_permissions --permissions 'view_query,list_dashboards' 4
+```
+
+```
+# query-db, デフォルトのまま
+./manage.py groups change_permissions --permissions 'create_dashboard,create_query,edit_dashboard,edit_query,view_source,execute_query,list_users,schedule_query,list_alerts,list_data_sources' 4
+```
+
+```
+# exec-db, view-dbと同義だたdata_sourceがfullaccess
+./manage.py groups change_permissions --permissions 'view_query,list_dashboards' 6
+```
+
